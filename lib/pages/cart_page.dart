@@ -29,7 +29,7 @@ class _CartPageState extends State<CartPage> {
     String password = "yoahilaxsghpeffa";
     final smtpServer = gmail(username, password);
     final message = Message()
-      ..from = Address(username, 'Gelchoda')
+      ..from = Address(username, 'CampusKraft')
       ..recipients.add(recipientMail)
       ..subject = 'Booking Change'
       ..text = 'Message: $messageMail';

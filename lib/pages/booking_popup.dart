@@ -34,7 +34,7 @@ class _BookingPopupState extends State<BookingPopup> {
     }
   }
 
-  List<dynamic> cart = [];
+  List cart = [];
   void getCart() async {
     DocumentSnapshot snap = await FirebaseFirestore.instance
         .collection('users')
@@ -42,7 +42,55 @@ class _BookingPopupState extends State<BookingPopup> {
         .get();
     setState(() {
       cart = (snap.data() as Map<String, dynamic>)['cart'];
+      print(cart[0].runtimeType);
     });
+  }
+
+  Future<void> addRequestToCart(
+      String userId, Map<String, dynamic> newRequest) async {
+    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
+
+    try {
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final userSnapshot = await transaction.get(userRef);
+
+        // Check if the request already exists in the user's cart
+        final List cart = userSnapshot['cart'] ?? [];
+        if (_isRequestAlreadyExists(cart, newRequest)) {
+          // Request already exists, handle accordingly (e.g., throw an error)
+          getSnackBar(
+              'You can only book ${newRequest['title']} once in a day in one hostel and room combination',
+              context);
+          throw 'Request already exists in the cart';
+        }
+
+        // Add the new request to the cart
+        else {
+          cart.add(newRequest);
+        }
+
+        // Update the user's cart
+        transaction.update(userRef, {'cart': cart});
+        sendMail(
+            recipientMail: newRequest['email'],
+            messageMail: '''Dear ${newRequest['title']},
+
+We would like to inform you that a booking request has been submitted for ${newRequest['title']} service in ${bhawanChoice} Bhawan, Room ${roomController.text}, on ${chosenDate.toString().substring(0, 10)}. Your prompt attention to this matter is greatly appreciated.''');
+      });
+    } catch (e) {
+      // Handle the error (e.g., show a message to the user)
+      print('Error adding request to cart: $e');
+    }
+  }
+
+  bool _isRequestAlreadyExists(
+      List<dynamic> cart, Map<String, dynamic> newRequest) {
+    // Check if there is an existing request with the same date, venue, and booking id
+    return cart.any((request) =>
+        request['date'] == newRequest['date'] &&
+        request['bhawan'] == newRequest['bhawan'] &&
+        request['room'] == newRequest['room'] &&
+        request['id'] == newRequest['id']);
   }
 
   TextEditingController roomController = TextEditingController();
@@ -237,7 +285,8 @@ class _BookingPopupState extends State<BookingPopup> {
                             for (int i = 0; i < empList.length; i++) {
                               final empInfo = empList[i].data();
 
-                              if (empInfo['service'] == cartItem['title']) {
+                              if (empInfo['service'] == cartItem['title'] &&
+                                  !(cart.contains(cartItem))) {
                                 print(empInfo);
                                 Map<String, dynamic> req =
                                     Map<String, dynamic>.from(cartItem);
@@ -263,24 +312,32 @@ class _BookingPopupState extends State<BookingPopup> {
                                     .doc("$docID")
                                     .set(req);
                                 cartItem['service_providers']++;
+                              } else if (cart.contains(cartItem)) {
+                                getSnackBar(
+                                    'U can only book one ${cartItem['title']} service in one day :)',
+                                    context);
                               }
                             }
-                            setState(
-                              () {
-                                cart.add(cartItem);
-                                FirebaseFirestore.instance
-                                    .collection('users')
-                                    .doc(FirebaseAuth
-                                        .instance.currentUser!.email!
-                                        .substring(0, 8))
-                                    .update({'cart': cart});
-                              },
-                            );
-                            sendMail(
-                                recipientMail: cartItem['email'],
-                                messageMail: '''Dear ${cartItem['title']},
 
-We would like to inform you that a booking request has been submitted for ${cartItem['title']} service in ${bhawanChoice} Bhawan, Room ${roomController.text}, on ${chosenDate.toString().substring(0, 10)}. Your prompt attention to this matter is greatly appreciated.''');
+//                             if (!cart.contains(cartItem)) {
+//                               cart.add(cartItem);
+//                               FirebaseFirestore.instance
+//                                   .collection('users')
+//                                   .doc(FirebaseAuth.instance.currentUser!.email!
+//                                       .substring(0, 8))
+//                                   .update({'cart': cart});
+//                               sendMail(
+//                                   recipientMail: cartItem['email'],
+//                                   messageMail: '''Dear ${cartItem['title']},
+
+// We would like to inform you that a booking request has been submitted for ${cartItem['title']} service in ${bhawanChoice} Bhawan, Room ${roomController.text}, on ${chosenDate.toString().substring(0, 10)}. Your prompt attention to this matter is greatly appreciated.''');
+//                             } else {
+//                               print("Item already exists in the cart");
+//                             }
+                            addRequestToCart(
+                                FirebaseAuth.instance.currentUser!.email!
+                                    .substring(0, 8),
+                                cartItem);
                           },
                           child: Text("Book it",
                               style:

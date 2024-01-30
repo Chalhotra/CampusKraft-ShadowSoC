@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
+
 import 'package:ig_clone/auth_methods.dart';
+import 'package:ig_clone/pages/dialog_box.dart';
+
 import 'package:ig_clone/pages/user_bookings.dart';
 import 'package:ig_clone/pages/user_login_page.dart';
 
@@ -20,6 +24,10 @@ class _ProfilePageState extends State<ProfilePage> {
   String email = "";
   List<dynamic> cart = [];
 
+  String? photoUrl;
+
+  void uploadAvatar() {}
+
   Future<void> getUserInfo() async {
     DocumentSnapshot snap = await _firestore
         .collection('users')
@@ -31,7 +39,36 @@ class _ProfilePageState extends State<ProfilePage> {
       email = (snap.data() as Map<String, dynamic>)['mail'];
       enrollment = (snap.data() as Map<String, dynamic>)['enrollment_number'];
       cart = (snap.data() as Map<String, dynamic>)['cart'];
+      photoUrl = (snap.data() as Map<String, dynamic>)['photoUrl'];
     });
+    print('Photo URL: $photoUrl');
+  }
+
+  // Future<void> imageBytesFromUrl() async {
+  //   FirebaseStorage storage = FirebaseStorage.instance;
+  //   Reference ref = storage
+  //       .ref()
+  //       .child('userProfilePics')
+  //       .child(FirebaseAuth.instance.currentUser!.email!.substring(0, 8));
+  //   String photoUrl = await ref.getDownloadURL();
+  //   http.Response response = await http.get(Uri.parse(photoUrl));
+
+  //   if (response.statusCode == 200) {
+  //     setState(() {
+  //       _image = response.bodyBytes;
+  //     });
+  //   } else {
+  //     throw Exception('Failed to load image');
+  //   }
+  // }
+
+  void profileAlertDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return ProfileDialogBox(onAvatarUpdated: getUserInfo);
+      },
+    );
   }
 
   List<dynamic> get pintucart => cart;
@@ -40,6 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
     // TODO: implement initState
     super.initState();
     getUserInfo();
+
     print(name);
   }
 
@@ -51,17 +89,42 @@ class _ProfilePageState extends State<ProfilePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Center(
-            child: CircleAvatar(
-              radius: 64,
-              backgroundColor: Colors.blue,
-            ),
+            child: Stack(children: [
+              (photoUrl == null || photoUrl == "")
+                  ? const CircleAvatar(
+                      radius: 64,
+                      backgroundColor: Colors.blue,
+                    )
+                  : CircleAvatar(
+                      radius: 64,
+                      backgroundImage: NetworkImage(photoUrl!),
+                    ),
+              Positioned(
+                bottom: -5,
+                left: 85,
+                child: Stack(children: [
+                  const Positioned(
+                    left: 6,
+                    top: 7,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 17,
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: profileAlertDialog,
+                      icon: const Icon(Icons.camera_alt)),
+                ]),
+              )
+            ]),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Text("$name",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          SizedBox(
+              style:
+                  const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          const SizedBox(
             height: 20,
           ),
           Container(
@@ -81,16 +144,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           "Enrollment\nNumber:",
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         Text("$enrollment",
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold))
                       ],
                     )),
@@ -98,16 +161,16 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         "Email Address:",
                         style: TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 10,
                       ),
                       Text('$email',
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold))
                     ],
                   ),
@@ -115,37 +178,40 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           SizedBox(
-            width: double.infinity,
+            width: 200,
             child: TextButton(
-                style: TextButton.styleFrom(foregroundColor: Colors.grey),
+                style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey,
+                    backgroundColor: Colors.black),
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => UserBookingPage(),
+                    builder: (context) => const UserBookingPage(),
                   ));
                 },
-                child: Text("Booking History",
+                child: const Text("Booking History",
                     style: TextStyle(
-                        color: Color.fromRGBO(48, 48, 48, 1),
+                        // color: Color.fromRGBO(48, 48, 48, 1),
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold))),
           ),
-          SizedBox(height: 0),
+          const SizedBox(height: 0),
           SizedBox(
-            width: double.infinity,
+            width: 200,
             child: TextButton(
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                style: TextButton.styleFrom(backgroundColor: Colors.red),
                 onPressed: () {
                   AuthMethods().logOut();
-                  Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => LoginPage()));
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const LoginPage()));
                 },
-                child: Text("Logout",
+                child: const Text("Logout",
                     style: TextStyle(
-                        color: Colors.red,
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold))),
           )

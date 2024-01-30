@@ -170,7 +170,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           foregroundColor: Colors.black87,
                           textStyle: Theme.of(context).textTheme.titleMedium)),
                 ),
-                Spacer(flex: 3)
+                const Spacer(flex: 1)
               ],
             ),
           )

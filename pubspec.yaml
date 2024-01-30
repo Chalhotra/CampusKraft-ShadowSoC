@@ -28,15 +28,19 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  app_settings: ^5.1.1
   cloud_firestore: ^4.13.6
   cupertino_icons: ^1.0.2
   firebase_auth: ^4.15.3
   firebase_core: ^2.24.2
+  firebase_messaging: ^14.7.10
   firebase_storage: ^11.5.6
   flutter:
     sdk: flutter
+  flutter_local_notifications: ^16.3.0
   fluttertoast: ^8.2.4
-  image_picker: ^1.0.5
+  http: ^1.1.2
+  image_picker: ^1.0.6
   mailer: ^6.0.1
   provider: ^6.1.1
 

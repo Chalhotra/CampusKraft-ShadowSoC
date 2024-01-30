@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 
 import 'package:ig_clone/pages/cart_provider.dart';
 import 'package:ig_clone/pages/employee_pages/emp_home.dart';
-import 'package:ig_clone/pages/employee_profile_page.dart';
+import 'package:ig_clone/pages/notification_settings.dart';
+
 import 'package:ig_clone/pages/user_login_page.dart';
 import 'package:ig_clone/pages/main.dart';
 
@@ -24,11 +25,14 @@ void main() async {
       authDomain: "instagram-clone-b9819.firebaseapp.com",
       storageBucket: "instagram-clone-b9819.appspot.com",
     ));
+    await NotificationServices().initNotifications();
   } else {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    await NotificationServices().initNotifications();
   }
+
   runApp(const MyApp());
 }
 

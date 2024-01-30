@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ig_clone/auth_methods.dart';
+import 'package:ig_clone/pages/emp_dialog_box.dart';
 import 'package:ig_clone/pages/employee_login_page.dart';
 
 class EmployeeProfilePage extends StatefulWidget {
@@ -17,6 +18,16 @@ class _EmployeeProfilePageState extends State<EmployeeProfilePage> {
   String name = "";
   int emp_id = 0;
   String email = "";
+  String? photoUrl;
+
+  void profileAlertDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return EmployeeProfileDialog(onAvatarUpdated: getEmployeeInfo);
+      },
+    );
+  }
 
   Future<void> getEmployeeInfo() async {
     DocumentSnapshot snap = await _firestore
@@ -28,6 +39,7 @@ class _EmployeeProfilePageState extends State<EmployeeProfilePage> {
       name = (snap.data() as Map<String, dynamic>)['name'];
       email = (snap.data() as Map<String, dynamic>)['mail'];
       emp_id = (snap.data() as Map<String, dynamic>)['employee_id'];
+      photoUrl = (snap.data() as Map<String, dynamic>)['photoUrl'];
     });
   }
 
@@ -47,10 +59,34 @@ class _EmployeeProfilePageState extends State<EmployeeProfilePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Center(
-            child: CircleAvatar(
-              radius: 64,
-              backgroundColor: Colors.blue,
-            ),
+            child: Stack(children: [
+              (photoUrl == null || photoUrl == "")
+                  ? const CircleAvatar(
+                      radius: 64,
+                      backgroundColor: Colors.blue,
+                    )
+                  : CircleAvatar(
+                      radius: 64,
+                      backgroundImage: NetworkImage(photoUrl!),
+                    ),
+              Positioned(
+                bottom: -5,
+                left: 85,
+                child: Stack(children: [
+                  const Positioned(
+                    left: 10,
+                    top: 9,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 15,
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: profileAlertDialog,
+                      icon: const Icon(Icons.add)),
+                ]),
+              )
+            ]),
           ),
           SizedBox(
             height: 10,
@@ -117,17 +153,17 @@ class _EmployeeProfilePageState extends State<EmployeeProfilePage> {
           ),
           SizedBox(height: 50),
           SizedBox(
-            width: double.infinity,
+            width: 200,
             child: TextButton(
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                style: TextButton.styleFrom(backgroundColor: Colors.red),
                 onPressed: () {
                   AuthMethods().logOut();
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => EmployeeLoginPage()));
+                      builder: (context) => const EmployeeLoginPage()));
                 },
-                child: Text("Logout",
+                child: const Text("Logout",
                     style: TextStyle(
-                        color: Colors.red,
+                        color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold))),
           )

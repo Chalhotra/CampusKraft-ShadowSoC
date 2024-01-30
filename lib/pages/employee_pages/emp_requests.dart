@@ -33,7 +33,8 @@ class _EmployeeRequestsState extends State<EmployeeRequests> {
   }
 
   Future<void> removeFromCart(
-      {required String userID,
+      {required String user_mail,
+      required String userID,
       required Map<String, dynamic> productToBeRemoved}) async {
     DocumentReference userRef =
         FirebaseFirestore.instance.collection('users').doc(userID);
@@ -48,6 +49,10 @@ class _EmployeeRequestsState extends State<EmployeeRequests> {
           currentCart[i]['room'] == productToBeRemoved['room']) {
         if (currentCart[i]['service_providers'] == 1) {
           currentCart.removeAt(i);
+          sendMail(
+              recipientMail: user_mail,
+              messageMail:
+                  'Tum logon ne daraasal mujhe gelchod samajh liya tha');
         } else {
           currentCart[i]['service_providers']--;
         }
@@ -223,6 +228,7 @@ class _EmployeeRequestsState extends State<EmployeeRequests> {
                             final roomDoc = currentReq['room'];
                             final docID =
                                 "${user_id}_${dateDoc}_${bhawanDoc}_${roomDoc}";
+                            String usMail = cartItem['user_email'];
                             cartItem.remove('user_email');
                             cartItem.remove('req_id');
                             print(cartItem);
@@ -236,6 +242,7 @@ class _EmployeeRequestsState extends State<EmployeeRequests> {
 
                             setState(() {
                               removeFromCart(
+                                  user_mail: usMail,
                                   userID: currentReq['req_id'],
                                   productToBeRemoved: cartItem);
                             });
