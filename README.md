@@ -1,16 +1,10 @@
-# ig_clone
+# CampusKraft - A convenient services booking app for IITR Junta
 
 A new Flutter project.
 
-## Getting Started
+## Steps to get the project up and running on your machine:
 
-This project is a starting point for a Flutter application.
+- Clone this github repo
+- Install all the required dependencies using "flutter pub get"
+- Preferably run this on an actual android/iOS device
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
