@@ -74,11 +74,11 @@ class _EmployeeProfilePageState extends State<EmployeeProfilePage> {
                 left: 85,
                 child: Stack(children: [
                   const Positioned(
-                    left: 10,
-                    top: 9,
+                    left: 6,
+                    top: 6,
                     child: CircleAvatar(
                       backgroundColor: Colors.white,
-                      radius: 15,
+                      radius: 20,
                     ),
                   ),
                   IconButton(

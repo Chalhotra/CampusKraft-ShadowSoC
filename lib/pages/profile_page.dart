@@ -104,11 +104,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 left: 85,
                 child: Stack(children: [
                   const Positioned(
-                    left: 6,
-                    top: 7,
+                    left: 5,
+                    top: 6,
                     child: CircleAvatar(
                       backgroundColor: Colors.white,
-                      radius: 17,
+                      radius: 20,
                     ),
                   ),
                   IconButton(

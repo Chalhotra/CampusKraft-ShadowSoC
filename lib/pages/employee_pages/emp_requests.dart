@@ -93,7 +93,6 @@ class _EmployeeRequestsState extends State<EmployeeRequests> {
 
     try {
       await send(message, smtpServer);
-      getSnackBar('Successfully Booked', context);
     } catch (e) {
       print(e.toString());
     }
@@ -208,6 +207,7 @@ class _EmployeeRequestsState extends State<EmployeeRequests> {
                                     .delete();
                               }
                             }
+                            getSnackBar('Request moved to bookings', context);
 
                             sendMail(
                                 recipientMail: currentReq['user_email'],
@@ -246,12 +246,14 @@ class _EmployeeRequestsState extends State<EmployeeRequests> {
                                   userID: currentReq['req_id'],
                                   productToBeRemoved: cartItem);
                             });
+                            getSnackBar(
+                                'Request cancelled successfully', context);
                             sendMail(
                                 recipientMail: currentReq['user_email'],
                                 messageMail:
                                     'Your Request for ${currentReq['title']} has been cancelled by one employee, wait around to see if others respond');
                           },
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.close,
                             color: Colors.red,
                           ))

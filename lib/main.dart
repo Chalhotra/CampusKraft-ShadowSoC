@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
                 } else if (FirebaseAuth.instance.currentUser!.email!
                         .substring(9, 17) ==
                     'employee') {
-                  return EmployeeHome();
+                  return const EmployeeHome();
                 }
               } else if (snapshot.hasError) {
                 return Center(child: Text("${snapshot.error}"));

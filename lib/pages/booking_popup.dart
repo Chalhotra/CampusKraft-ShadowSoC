@@ -28,7 +28,9 @@ class _BookingPopupState extends State<BookingPopup> {
 
     try {
       await send(message, smtpServer);
-      getSnackBar('Successfully Booked', context);
+      getSnackBar(
+          'Request sent, you will be updated on your email address regarding the progress of the request',
+          context);
     } catch (e) {
       print(e.toString());
     }
